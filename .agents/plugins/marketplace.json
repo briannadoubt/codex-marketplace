@@ -1,0 +1,20 @@
+{
+  "name": "briannadoubt",
+  "interface": {
+    "displayName": "briannadoubt Codex Plugins"
+  },
+  "plugins": [
+    {
+      "name": "scope",
+      "source": {
+        "source": "local",
+        "path": "./plugins/scope"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer tools"
+    }
+  ]
+}
