@@ -1,0 +1,53 @@
+name: Sync Scope plugin
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 8 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out marketplace
+        uses: actions/checkout@v4
+        with:
+          path: codex-marketplace
+
+      - name: Check out Scope
+        uses: actions/checkout@v4
+        with:
+          repository: briannadoubt/scope
+          ref: main
+          path: scope
+
+      - name: Sync generated plugin skill
+        run: |
+          python3 codex-marketplace/scripts/sync-scope-plugin.py \
+            --marketplace-repo codex-marketplace \
+            --scope-repo scope
+
+      - name: Verify generated copy
+        run: |
+          python3 codex-marketplace/scripts/sync-scope-plugin.py \
+            --marketplace-repo codex-marketplace \
+            --scope-repo scope \
+            --check
+
+      - name: Commit synced skill
+        run: |
+          cd codex-marketplace
+          if git diff --quiet -- plugins/scope/skills/scope/SKILL.md; then
+            echo "Scope plugin skill is already current."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add plugins/scope/skills/scope/SKILL.md
+          git commit -m "Sync Scope plugin skill"
+          git push
